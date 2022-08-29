@@ -45,7 +45,7 @@ const typeDefs = gql`
     addFriend(friendId: ID!): User!
     deleteFriend(friendId: ID!): User!
 
-    createSchedule(title: String!) : Schedule!
+    createSchedule(title: String!, color: String!) : Schedule!
     updateSchedule(id: ID!, title: String!) : Schedule
     deleteSchedule(id: ID!): Boolean!
     setActive(id: ID!, isActive: Int) : Schedule
@@ -87,6 +87,7 @@ const typeDefs = gql`
     title: String!
     isActive: Int
     lastUpdated: String!
+    color: String!
   }
 
   type Plan {
@@ -252,13 +253,14 @@ const resolvers = {
     },
 
     // CRUD Schedule
-    createSchedule: async (_, { title }, { db, user }) => {
+    createSchedule: async (_, { title, color }, { db, user }) => {
       if (!user) {
         throw new Error('Authentication Error');
       }
 
       const newSchedule = {
         title,
+        color,
         isActive: 1,
         lastUpdated: new Date().toISOString(),
         userId: user._id
