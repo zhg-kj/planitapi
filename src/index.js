@@ -31,6 +31,7 @@ const typeDefs = gql`
     myFriends: [User!]!
     mySchedules: [Schedule!]!
     myActiveSchedules: [Schedule!]!
+    myPlans: [Plan]!
     getActiveSchedules(id: ID!): [Schedule!]!
     getSchedule(id: ID!): Schedule
     getPlans(id: ID!): [Plan!]!
@@ -94,7 +95,7 @@ const typeDefs = gql`
     id: ID!
     start: String!
     end: String!
-
+    userId: String!
     schedule: Schedule!
   }
 `;
@@ -106,7 +107,7 @@ const resolvers = {
         throw new Error('Invalid Credentials!');
       }
 
-      const friends = await db.collection('Users').find({ friends: { $eq: ObjectId(user._id) } }).toArray()
+      const friends = await db.collection('Users').find({ friends: { $eq: ObjectId(user._id)} }).toArray()
       return friends
     },
     mySchedules: async (_, __, { db, user }) => {
@@ -114,7 +115,7 @@ const resolvers = {
         throw new Error('Invalid Credentials!');
       }
 
-      const schedules = await db.collection('Schedules').find({ userId: ObjectId(user._id)}).toArray()
+      const schedules = await db.collection('Schedules').find({ userId: ObjectId(user._id) }).toArray()
       return schedules
     },
     myActiveSchedules: async (_, __, { db, user }) => {
@@ -122,8 +123,16 @@ const resolvers = {
         throw new Error('Invalid Credentials!');
       }
 
-      const schedules = await db.collection('Schedules').find({ userId: ObjectId(user._id), isActive: 1}).toArray()
+      const schedules = await db.collection('Schedules').find({ userId: ObjectId(user._id), isActive: 1 }).toArray()
       return schedules
+    },
+    myPlans: async (_, __, { db, user }) => {
+      if (!user) {
+        throw new Error('Invalid Credentials!');
+      }
+
+      const plans = await db.collection('Plans').find({ userId: ObjectId(user._id) }).toArray()
+      return plans
     },
     getActiveSchedules: async (_, { id }, { db, user }) => {
       if (!user) {
@@ -144,7 +153,7 @@ const resolvers = {
         throw new Error('Invalid Credentials!');
       }
 
-      const plans = await db.collection('Plans').find({ scheduleId: ObjectId(id)}).toArray()
+      const plans = await db.collection('Plans').find({ scheduleId: ObjectId(id) }).toArray()
       return plans
     },
     getUsers: async (_, __, { db, user }) => {
@@ -152,7 +161,7 @@ const resolvers = {
         throw new Error('Invalid Credentials!');
       }
 
-      const users = await db.collection('Users').find({ _id: {$ne: ObjectId(user._id)}}).toArray()
+      const users = await db.collection('Users').find({ _id: {$ne: ObjectId(user._id)} }).toArray()
       return users
     },
   },
@@ -302,7 +311,8 @@ const resolvers = {
         end: end,
         scheduleId: ObjectId(scheduleId),
         title: title,
-        description: description
+        description: description,
+        userId: user._id
       }
 
       //TODO make schedule of plan change its last updated
