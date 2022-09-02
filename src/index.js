@@ -314,7 +314,7 @@ const resolvers = {
         scheduleId: ObjectId(scheduleId),
         title: title,
         description: description,
-        userIds: [user._id].push(...users)
+        userIds: [user._id].concat(...users)
       }
 
       //TODO make schedule of plan change its last updated
