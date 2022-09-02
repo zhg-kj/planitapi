@@ -50,7 +50,7 @@ const typeDefs = gql`
     deleteSchedule(id: ID!): Boolean!
     setActive(id: ID!, isActive: Int) : Schedule
 
-    createPlan(start: String!, end: String!, scheduleId: ID!, title: String!, description: String) : Plan!
+    createPlan(start: String!, end: String!, scheduleId: ID!, title: String!, description: String, users: [String]) : Plan!
     updatePlan(id: ID!, start: String!, end: String!) : Plan!
     deletePlan(id: ID!) : Boolean!
   }
@@ -96,7 +96,7 @@ const typeDefs = gql`
     id: ID!
     start: String!
     end: String!
-    userId: String!
+    userIds: [String!]!
     schedule: Schedule!
   }
 `;
@@ -132,7 +132,7 @@ const resolvers = {
         throw new Error('Invalid Credentials!');
       }
 
-      const plans = await db.collection('Plans').find({ userId: ObjectId(user._id) }).toArray()
+      const plans = await db.collection('Plans').find({ userId: { $in: ObjectId(user._id) } }).toArray()
       return plans
     },
     getActiveSchedules: async (_, { id }, { db, user }) => {
@@ -303,7 +303,7 @@ const resolvers = {
     },
 
     // CRUD Plan
-    createPlan: async (_, { start, end, scheduleId, title, description }, { db, user }) => {
+    createPlan: async (_, { start, end, scheduleId, title, description, users }, { db, user }) => {
       if (!user) {
         throw new Error('Authentication Error');
       }
@@ -314,7 +314,7 @@ const resolvers = {
         scheduleId: ObjectId(scheduleId),
         title: title,
         description: description,
-        userId: user._id
+        userIds: [user._id].push(...users)
       }
 
       //TODO make schedule of plan change its last updated
