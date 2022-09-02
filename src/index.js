@@ -308,13 +308,18 @@ const resolvers = {
         throw new Error('Authentication Error');
       }
 
+      const u = users;
+      u.forEach((element, index) => {
+        u[index] = ObjectId(element);
+      });
+
       const newPlan = {
         start: start,
         end: end,
         scheduleId: ObjectId(scheduleId),
         title: title,
         description: description,
-        userIds: [user._id].concat(...users)
+        userIds: [user._id].concat(...u)
       }
 
       //TODO make schedule of plan change its last updated
