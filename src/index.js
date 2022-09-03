@@ -146,7 +146,7 @@ const resolvers = {
         u[index] = ObjectId(element);
       });
 
-      const plans = await db.collection('Plans').find({ userIds: { $in: u } }).toArray()
+      const plans = await db.collection('Plans').find({ userIds: { $elemMatch: { $in: [user._id].concat(...u) } } }).toArray()
       return plans
     },
     getActiveSchedules: async (_, { id }, { db, user }) => {
