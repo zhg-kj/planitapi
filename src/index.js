@@ -32,7 +32,7 @@ const typeDefs = gql`
     mySchedules: [Schedule!]!
     myActiveSchedules: [Schedule!]!
     myPlans: [Plan]!
-    getPlansByUserIds(id: [String]!): [Plan!]!
+    getPlansByUserIds(users: [String]!): [Plan!]!
     getActiveSchedules(id: ID!): [Schedule!]!
     getSchedule(id: ID!): Schedule
     getPlans(id: ID!): [Plan!]!
@@ -141,7 +141,12 @@ const resolvers = {
         throw new Error('Invalid Credentials!');
       }
 
-      const plans = await db.collection('Plans').find({ userIds: { $elemMatch: { $in: [user._id].concat(...users) } } }).toArray()
+      const u = users;
+      u.forEach((element, index) => {
+        u[index] = ObjectId(element);
+      });
+
+      const plans = await db.collection('Plans').find({ userIds: { $elemMatch: { $in: [user._id].concat(...u) } } }).toArray()
       return plans
     },
     getActiveSchedules: async (_, { id }, { db, user }) => {
