@@ -32,7 +32,7 @@ const typeDefs = gql`
     mySchedules: [Schedule!]!
     myActiveSchedules: [Schedule!]!
     myPlans: [Plan]!
-    getPlansByUserIds(id: [String!]!): [Plan!]!
+    getPlansByUserIds(id: [String]!): [Plan!]!
     getActiveSchedules(id: ID!): [Schedule!]!
     getSchedule(id: ID!): Schedule
     getPlans(id: ID!): [Plan!]!
