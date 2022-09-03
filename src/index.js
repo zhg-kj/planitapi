@@ -141,12 +141,7 @@ const resolvers = {
         throw new Error('Invalid Credentials!');
       }
 
-      const u = users;
-      u.forEach((element, index) => {
-        u[index] = ObjectId(element);
-      });
-
-      const plans = await db.collection('Plans').find({ userIds: { $elemMatch: { $in: [user._id].concat(...u) } } }).toArray()
+      const plans = await db.collection('Plans').find({ userIds: { $elemMatch: { $in: [user._id].concat(...users) } } }).toArray()
       return plans
     },
     getActiveSchedules: async (_, { id }, { db, user }) => {
